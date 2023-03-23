@@ -2,6 +2,13 @@
 
 
 ---
+## Description
+Can be used to collect statistics on players who have registered for an OW2 tournament. 
+The entry repository is a Google SpreadSheet, from which a list of battletags players can be obtained. 
+**So far, only the ability to collect data on the main player accounts has been implemented**
+
+
+---
 ## Setup instructions
 1) Create and activate venv
 2) `pip install -r requirements.txt`
@@ -11,6 +18,7 @@
 6) `pre-commit install` and test it with `pre-commit run --all-files`
 7) Create API credentials by this [guide](https://docs.gspread.org/en/latest/oauth2.html#for-bots-using-service-account)
 8) Move your credentials file to `/gspread_config` directory and rename it to `gspread_config.json`
+
 
 ---
 ## Run Instructions
@@ -30,7 +38,6 @@ TypeOfChange(filenameOrSpaceOfChanges): short descriptions of changes
 Example of commit:
 
 `feat(users): added api endpoints for players profiles`
-
 
 
 ---

@@ -1,10 +1,12 @@
 import json
 
+import pandas as pd  # type: ignore
 import requests
 
 REQUEST_BODY = "https://overfast-api.tekrop.fr/players/"
 REQUEST_SPECS_COMPET = "/stats/summary?gamemode=competitive"
 REQUEST_SPECS_SUM = "/summary"
+ROLES_LIST = ["tank", "damage", "support"]
 
 
 def prepare_btags(btags_list: list) -> list:
@@ -41,3 +43,17 @@ def get_player_rank(btag: str) -> dict:
         ranks = curr_player_json["competitive"]["pc"]
         ranks["btag"] = btag
     return ranks
+
+
+def get_players_ranks_data(btag_list: list):
+    ranks_list = []
+    cleaned_btags = prepare_btags(btag_list)
+    for btag in cleaned_btags:
+        player_ranks = get_player_rank(btag)
+        for value in ROLES_LIST:
+            if isinstance(player_ranks[value], dict):
+                div = player_ranks[value]["division"]
+                tier = player_ranks[value]["tier"]
+                player_ranks[value] = div + str(tier)
+        ranks_list.append(player_ranks)
+    return pd.DataFrame.from_records(ranks_list)

@@ -4,6 +4,7 @@ import requests
 
 REQUEST_BODY = "https://overfast-api.tekrop.fr/players/"
 REQUEST_SPECS_COMPET = "/stats/summary?gamemode=competitive"
+REQUEST_SPECS_SUM = "/summary"
 
 
 def prepare_btags(btags_list: list) -> list:
@@ -27,3 +28,16 @@ def get_player_stats(btag: str, roles: list):
                 roles_stats[role] = None
         roles_stats["btag"] = btag
     return roles_stats
+
+
+def get_player_rank(btag: str) -> dict:
+    req = requests.request("GET", f"{REQUEST_BODY}{btag}{REQUEST_SPECS_SUM}")
+    curr_player_json = json.loads(req.text)
+    try:
+        curr_player_json["competitive"]["pc"]
+    except KeyError:
+        ranks = {"tank": None, "damage": None, "support": None, "btag": btag}
+    else:
+        ranks = curr_player_json["competitive"]["pc"]
+        ranks["btag"] = btag
+    return ranks

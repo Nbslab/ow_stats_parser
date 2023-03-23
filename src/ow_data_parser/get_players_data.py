@@ -9,10 +9,7 @@ REQUEST_SPECS_COMPET = "/stats/summary?gamemode=competitive"
 REQUEST_SPECS_SUM = "/summary"
 ROLES_LIST = ["tank", "damage", "support"]
 GSPREAD_CONFIG = "gspread_config/gspread_config.json"
-SHEET_URL = (
-    "https://docs.google.com/spreadsheets/d/1fBmwHbJnHCCGAY8fz-9lFEP65axho0Wh"
-    "UT/I3a0rVke8/edit#gid=531489963"
-)
+SHEET_URL = "1fBmwHbJnHCCGAY8fz-9lFEP65axho0WhUTI3a0rVke8/edit#gid=531489963"
 
 
 def prepare_btags(btags_list: list) -> list:
@@ -43,6 +40,8 @@ def get_player_rank(btag: str) -> dict:
     curr_player_json = json.loads(req.text)
     try:
         curr_player_json["competitive"]["pc"]
+    except TypeError:
+        ranks = {"tank": None, "damage": None, "support": None, "btag": btag}
     except KeyError:
         ranks = {"tank": None, "damage": None, "support": None, "btag": btag}
     else:
@@ -95,9 +94,28 @@ def get_players_stats_data(btag_list: list):
 
 def get_players_list() -> list:
     gc = gspread.service_account(filename=GSPREAD_CONFIG)
-    sht = gc.open_by_url(SHEET_URL)
+    sht = gc.open_by_url(f"https://docs.google.com/spreadsheets/d/{SHEET_URL}")
     worksheet = sht.get_worksheet(0)
     values_list = worksheet.col_values(2)
     del values_list[0]
     del values_list[1]
     return values_list
+
+
+def build_datasets():
+    players_list = get_players_list()
+    df_ranks = get_players_ranks_data(players_list)
+    first_column = df_ranks.pop("btag")
+    df_ranks.insert(0, "btag", first_column)
+    stats = get_players_stats_data(players_list)
+    tank_df = pd.DataFrame.from_records(stats["tank"])
+    damage_df = pd.DataFrame.from_records(stats["damage"])
+    support_df = pd.DataFrame.from_records(stats["support"])
+    df_ranks.to_excel("dataframes/tournament16_ranks.xlsx")
+    tank_df.to_excel("dataframes/tournament16_tanks_stats.xlsx")
+    damage_df.to_excel("dataframes/tournament16_dps_stats.xlsx")
+    support_df.to_excel("dataframes/tournament16_supports_stats.xlsx")
+
+
+if __name__ == "__main__":
+    build_datasets()

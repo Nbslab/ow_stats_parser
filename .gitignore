@@ -84,6 +84,8 @@ dmypy.json
 .pyre/
 .pytype/
 .idea/
+gspread_config/*.json
+dataframes/*.xlsx
 
 cython_debug/
 .venv_win

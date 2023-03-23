@@ -14,7 +14,7 @@ The entry repository is a Google SpreadSheet, from which a list of battletags pl
 2) `pip install -r requirements.txt`
 3) `pip install -r requirements-dev.txt`
 4) `pip install -e .`
-5) At this stage u can test that all setup is fine by running something like 'flake8'
+5) At this stage you can test that all setup is fine by running something like 'flake8'
 6) `pre-commit install` and test it with `pre-commit run --all-files`
 7) Create API credentials by this [guide](https://docs.gspread.org/en/latest/oauth2.html#for-bots-using-service-account)
 8) Move your credentials file to `/gspread_config` directory and rename it to `gspread_config.json`
@@ -23,7 +23,7 @@ The entry repository is a Google SpreadSheet, from which a list of battletags pl
 ---
 ## Run Instructions
 1) Share your Google Sheet with bot account. [Example](https://www.youtube.com/watch?v=bu5wXjz2KvU)
-2) Paste url of ur sheet in `SHEET_URL` in `get_players_data.py` (I'll refactor this structure in the future)
+2) Paste url of your sheet in `SHEET_URL` in `get_players_data.py` (I'll refactor this structure in the future)
 3) Run `python get_players_data.py`
 
 

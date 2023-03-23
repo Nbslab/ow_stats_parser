@@ -1,5 +1,6 @@
 import json
 
+import gspread  # type: ignore
 import pandas as pd  # type: ignore
 import requests
 
@@ -7,6 +8,11 @@ REQUEST_BODY = "https://overfast-api.tekrop.fr/players/"
 REQUEST_SPECS_COMPET = "/stats/summary?gamemode=competitive"
 REQUEST_SPECS_SUM = "/summary"
 ROLES_LIST = ["tank", "damage", "support"]
+GSPREAD_CONFIG = "gspread_config/gspread_config.json"
+SHEET_URL = (
+    "https://docs.google.com/spreadsheets/d/1fBmwHbJnHCCGAY8fz-9lFEP65axho0Wh"
+    "UT/I3a0rVke8/edit#gid=531489963"
+)
 
 
 def prepare_btags(btags_list: list) -> list:
@@ -85,3 +91,13 @@ def get_players_stats_data(btag_list: list):
                     healing_per_10 = player_stats[value]["average"]["healing"]
                     stats_dict["support"][-1]["healing_per_10"] = healing_per_10
     return stats_dict
+
+
+def get_players_list() -> list:
+    gc = gspread.service_account(filename=GSPREAD_CONFIG)
+    sht = gc.open_by_url(SHEET_URL)
+    worksheet = sht.get_worksheet(0)
+    values_list = worksheet.col_values(2)
+    del values_list[0]
+    del values_list[1]
+    return values_list

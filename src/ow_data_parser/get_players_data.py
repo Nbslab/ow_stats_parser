@@ -57,3 +57,31 @@ def get_players_ranks_data(btag_list: list):
                 player_ranks[value] = div + str(tier)
         ranks_list.append(player_ranks)
     return pd.DataFrame.from_records(ranks_list)
+
+
+def get_players_stats_data(btag_list: list):
+    stats_dict: dict[str, list] = {"tank": [], "damage": [], "support": []}
+    cleaned_btags = prepare_btags(btag_list)
+    for btag in cleaned_btags:
+        player_stats = get_player_stats(btag, ROLES_LIST)
+        for value in ROLES_LIST:
+            if isinstance(player_stats[value], dict):
+                games_cnt = player_stats[value]["games_played"]
+                winrate = player_stats[value]["winrate"]
+                elims_per_10 = player_stats[value]["average"]["eliminations"]
+                dmg_per_10 = player_stats[value]["average"]["damage"]
+                deaths_per_10 = player_stats[value]["average"]["deaths"]
+                stats_dict[value].append(
+                    {
+                        "btag": btag,
+                        "games_played": games_cnt,
+                        "winrate": winrate,
+                        "elims_per_10": elims_per_10,
+                        "dmg_per_10": dmg_per_10,
+                        "death_per_10": deaths_per_10,
+                    }
+                )
+                if value == "support":
+                    healing_per_10 = player_stats[value]["average"]["healing"]
+                    stats_dict["support"][-1]["healing_per_10"] = healing_per_10
+    return stats_dict

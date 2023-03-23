@@ -97,8 +97,7 @@ def get_players_list() -> list:
     sht = gc.open_by_url(f"https://docs.google.com/spreadsheets/d/{SHEET_URL}")
     worksheet = sht.get_worksheet(0)
     values_list = worksheet.col_values(2)
-    del values_list[0]
-    del values_list[1]
+    del values_list[0:2]
     return values_list
 
 

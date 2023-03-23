@@ -13,7 +13,7 @@ The entry repository is a Google SpreadSheet, from which a list of battletags pl
 1) Create and activate venv
 2) `pip install -r requirements.txt`
 3) `pip install -r requirements-dev.txt`
-4) pip install -e . 
+4) `pip install -e .`
 5) At this stage u can test that all setup is fine by running something like 'flake8'
 6) `pre-commit install` and test it with `pre-commit run --all-files`
 7) Create API credentials by this [guide](https://docs.gspread.org/en/latest/oauth2.html#for-bots-using-service-account)

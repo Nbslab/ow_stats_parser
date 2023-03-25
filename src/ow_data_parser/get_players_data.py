@@ -1,4 +1,6 @@
 import json
+import os
+from configparser import ConfigParser
 
 import gspread  # type: ignore
 import pandas as pd  # type: ignore
@@ -8,8 +10,22 @@ REQUEST_BODY = "https://overfast-api.tekrop.fr/players/"
 REQUEST_SPECS_COMPET = "/stats/summary?gamemode=competitive"
 REQUEST_SPECS_SUM = "/summary"
 ROLES_LIST = ["tank", "damage", "support"]
-GSPREAD_CONFIG = "gspread_config/gspread_config.json"
-SHEET_URL = "1fBmwHbJnHCCGAY8fz-9lFEP65axho0WhUTI3a0rVke8/edit#gid=531489963"
+GSPREAD_CONFIG = "user_configs/gspread_config.json"
+
+
+def get_parent(path: str, levels=1) -> str:
+    current_directory = os.path.dirname(__file__)
+
+    parent_directory = current_directory
+    for i in range(0, levels):
+        parent_directory = os.path.split(parent_directory)[0]
+
+    file_path = os.path.join(parent_directory, path)
+    return file_path
+
+
+config = ConfigParser()
+config.read(get_parent(path="user_configs/config.ini", levels=2))
 
 
 def prepare_btags(btags_list: list) -> list:
@@ -94,7 +110,7 @@ def get_players_stats_data(btag_list: list):
 
 def get_players_list() -> list:
     gc = gspread.service_account(filename=GSPREAD_CONFIG)
-    sht = gc.open_by_url(f"https://docs.google.com/spreadsheets/d/{SHEET_URL}")
+    sht = gc.open_by_url(config["settings"]["sheet_url"])
     worksheet = sht.get_worksheet(0)
     values_list = worksheet.col_values(2)
     del values_list[0:2]
@@ -110,10 +126,32 @@ def build_datasets():
     tank_df = pd.DataFrame.from_records(stats["tank"])
     damage_df = pd.DataFrame.from_records(stats["damage"])
     support_df = pd.DataFrame.from_records(stats["support"])
-    df_ranks.to_excel("dataframes/tournament16_ranks.xlsx")
-    tank_df.to_excel("dataframes/tournament16_tanks_stats.xlsx")
-    damage_df.to_excel("dataframes/tournament16_dps_stats.xlsx")
-    support_df.to_excel("dataframes/tournament16_supports_stats.xlsx")
+    if config["settings"]["save_as_json"] == "False":
+        df_ranks.to_excel(
+            f"dataframes/Cup№{config['settings']['cup_number']}_ranks.xlsx"
+        )
+        tank_df.to_excel(
+            f"dataframes/Cup№{config['settings']['cup_number']}_tanks_stats.xlsx"
+        )
+        damage_df.to_excel(
+            f"dataframes/Cup№{config['settings']['cup_number']}_dps_stats.xlsx"
+        )
+        support_df.to_excel(
+            f"dataframes/Cup№{config['settings']['cup_number']}_supports_stats.xlsx"
+        )
+    else:
+        df_ranks.to_json(
+            f"dataframes/Cup№{config['settings']['cup_number']}_ranks.json"
+        )
+        tank_df.to_json(
+            f"dataframes/Cup№{config['settings']['cup_number']}_tanks_stats.json"
+        )
+        damage_df.to_json(
+            f"dataframes/Cup№{config['settings']['cup_number']}_dps_stats.json"
+        )
+        support_df.to_json(
+            f"dataframes/Cup№{config['settings']['cup_number']}_supports_stats.json"
+        )
 
 
 if __name__ == "__main__":
